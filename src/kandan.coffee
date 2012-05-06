@@ -1,10 +1,11 @@
-Robot        = require '../robot'
-Adapter      = require '../adapter'
+Robot        = require ('hubot').robot()
+Adapter      = require ('hubot').adapter()
 
-HTTP        = require 'http'
+HTTP         = require('http')
+HTTPS        = require('https')
+
 EventEmitter = require('events').EventEmitter
-
-Faye = require('faye')
+Faye         = require('faye')
 
 class Kandan extends Adapter
 
