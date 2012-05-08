@@ -1,10 +1,14 @@
-Robot        = require ('hubot').robot()
-Adapter      = require ('hubot').adapter()
+console.log("Loading hubot-kandan adapter")
 
+# Hubot API
+Robot        = require ('hubot').robot
+Adapter      = require ('hubot').adapter
+
+# Node API
 HTTP         = require('http')
-HTTPS        = require('https')
-
 EventEmitter = require('events').EventEmitter
+
+# Faye connector
 Faye         = require('faye')
 
 class Kandan extends Adapter
