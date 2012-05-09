@@ -52,6 +52,9 @@ class KandanStreaming extends EventEmitter
     @token    = options.token
     @channels = options.channels.split(",")
 
+    # For other functions
+    @robot = robot
+
     target = "http://#{ @host }:#{ @port }/remote/faye"
     robot.logger.info("Connecting to #{ target }")
 
@@ -65,10 +68,10 @@ class KandanStreaming extends EventEmitter
     }
     @client.addExtension(authExtension)
 
-    @client.bind "transport:down", () ->
+    @client.bind "transport:down", () =>
       robot.logger.info "Connected to Faye server"
 
-    @client.bind "transport:up", () ->
+    @client.bind "transport:up", () =>
       robot.logger.error "Disconnected from Faye server"
 
     for channel in @channels
@@ -78,7 +81,7 @@ class KandanStreaming extends EventEmitter
           'leave':   'LeaveMessage'
           'message': 'TextMessage'
         self.emit eventMap[activity.action], activity
-      subscription.errback((activity) ->
+      subscription.errback((activity) =>
         robot.logger.error activity
         robot.logger.error "Oops! could not connect to the server"
       )
