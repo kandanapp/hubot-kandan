@@ -1,8 +1,6 @@
-console.log("Loading hubot-kandan adapter")
-
 # Hubot API
-Robot        = require ('hubot').robot
-Adapter      = require ('hubot').adapter
+Robot        = require('hubot').robot()
+Adapter      = require('hubot').adapter()
 
 # Node API
 HTTP         = require('http')
@@ -42,11 +40,11 @@ exports.use = (robot) ->
 class KandanStreaming extends EventEmitter
   self = @
 
-  constructor: (options, @robot) ->
+  constructor: (options, robot) ->
     self = @
 
     unless options.token? and options.channels? and options.host?
-      @robot.logger.error "Not enough parameters provided. I need a host, token, and channels."
+      robot.logger.error "Not enough parameters provided. I need a host, token, and channels."
       process.exit(1)
 
     @host     = options.host
@@ -55,7 +53,7 @@ class KandanStreaming extends EventEmitter
     @channels = options.channels.split(",")
 
     target = "http://#{ @host }:#{ @port }/remote/faye"
-    console.log("Connecting to #{ target }")
+    robot.logger.info("Connecting to #{ target }")
 
     @client = new Faye.Client(target)
     @client.disable('websocket')
@@ -68,10 +66,10 @@ class KandanStreaming extends EventEmitter
     @client.addExtension(authExtension)
 
     @client.bind "transport:down", () ->
-      console.log "Connected to Faye server"
+      robot.logger.info "Connected to Faye server"
 
     @client.bind "transport:up", () ->
-      console.log "Disconnected from Faye server"
+      robot.logger.error "Disconnected from Faye server"
 
     for channel in @channels
       subscription = @client.subscribe "/channels/#{channel}", (activity) =>
@@ -81,8 +79,8 @@ class KandanStreaming extends EventEmitter
           'message': 'TextMessage'
         self.emit eventMap[activity.action], activity
       subscription.errback((activity) ->
-        console.log "Error", activity
-        console.log "Oops! could not connect to the server"
+        robot.logger.error activity
+        robot.logger.error "Oops! could not connect to the server"
       )
     @
 
