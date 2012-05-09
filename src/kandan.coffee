@@ -68,10 +68,10 @@ class KandanStreaming extends EventEmitter
     }
     @client.addExtension(authExtension)
 
-    @client.bind "transport:down", () =>
+    @client.bind "transport:up", () =>
       robot.logger.info "Connected to Faye server"
 
-    @client.bind "transport:up", () =>
+    @client.bind "transport:down", () =>
       robot.logger.error "Disconnected from Faye server"
 
     for channel in @channels
