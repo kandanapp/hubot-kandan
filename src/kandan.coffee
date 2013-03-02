@@ -1,6 +1,7 @@
 # Hubot API
-Robot        = require('hubot').robot()
-Adapter      = require('hubot').adapter()
+Robot        = require('hubot').Robot
+Adapter      = require('hubot').Adapter
+TextMessage  = require('hubot').TextMessage
 
 # Node API
 HTTP         = require('http')
@@ -29,8 +30,7 @@ class Kandan extends Adapter
     @bot = new KandanStreaming(options, @robot)
 
     @bot.on "TextMessage", (message) ->
-      unless message.user_id == 4
-        self.receive new Robot.TextMessage(message.user.email, message.content)
+      self.receive new TextMessage(message.user.email, message.content)
 
     self.emit "connected"
 
