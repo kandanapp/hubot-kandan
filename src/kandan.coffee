@@ -14,46 +14,50 @@ class Kandan extends Adapter
 
   send: (user, strings...) ->
     if strings.length > 0
-      @bot.message strings.shift(), 1, (err, data) =>
-        @robot.logger.error "Kandan error: #{err}" if err?
-        @send user, strings...
+      callback = errback = (response) => @send user, strings...
+      @bot.message strings.shift(), user?.room?.id || 1, callback, errback
 
   run: ->
-    self = @
-
     options =
       host:     process.env.HUBOT_KANDAN_HOST
       port:     process.env.HUBOT_KANDAN_PORT || 80
       token:    process.env.HUBOT_KANDAN_TOKEN
-      channels: process.env.HUBOT_KANDAN_CHANNELS
 
     @bot = new KandanStreaming(options, @robot)
+    callback = (myself) =>
+      @bot.on "TextMessage", (message) =>
+        unless myself.id == message.user.id
+          message.user.room = message.channel
+          @receive new TextMessage(message.user, message.content)
+      @emit "connected"
+    errback = (response) =>
+      throw new Error "Unable to determine profile information."
 
-    @bot.on "TextMessage", (message) ->
-      self.receive new TextMessage(message.user.email, message.content)
-
-    self.emit "connected"
+    @bot.Me callback, errback
 
 exports.use = (robot) ->
   new Kandan robot
 
 class KandanStreaming extends EventEmitter
-  self = @
-
   constructor: (options, robot) ->
-    self = @
+    @eventProcessors = {
+      user: {}
+      channel: {
+        delete: (data) => @unsubscribe(data.entity.id)
+        create: (data) => @subscribe(data.entity.id)
+      }
+      attachments: {}
+    }
 
-    unless options.token? and options.channels? and options.host?
-      robot.logger.error "Not enough parameters provided. I need a host, token, and channels."
+    unless options.token? and options.host?
+      robot.logger.error "Not enough parameters provided. I need a host and token."
       process.exit(1)
 
     @host     = options.host
     @port     = options.port
     @token    = options.token
-    @channels = options.channels.split(",")
 
-    # For other functions
-    @robot = robot
+    @logger = robot.logger
 
     target = "http://#{ @host }:#{ @port }/remote/faye"
     robot.logger.info("Connecting to #{ target }")
@@ -74,55 +78,83 @@ class KandanStreaming extends EventEmitter
     @client.bind "transport:down", () =>
       robot.logger.error "Disconnected from Faye server"
 
-    for channel in @channels
-      subscription = @client.subscribe "/channels/#{channel}", (activity) =>
-        eventMap =
-          'enter':   'EnterMessage'
-          'leave':   'LeaveMessage'
-          'message': 'TextMessage'
-        self.emit eventMap[activity.action], activity
-      subscription.errback((activity) =>
-        robot.logger.error activity
-        robot.logger.error "Oops! could not connect to the server"
-      )
+    @subscribeEvents()
+    # Always subscribe to the primary channel
+    @subscribe(1)
+    # Subscribe to all the other channels
+    callback = (channels) =>
+      for channel in channels
+        @subscribe(channel.id) unless channel.id == 1
+    errback = (err) =>
+      @logger.warn "Error retrieving channels list; will only listen on primary channel"
+    @Channels callback, errback
     @
 
-  message: (message, channelId, callback) ->
-    body = {"content":message, "channel_id":channelId, "activity": {"content":message, "channel_id":channelId, "action":"message"}}
-    @post "/channels/#{ channelId }/activities", body, callback
+  subscribeEvents: ->
+    @client.subscribe "/app/activities", (data) =>
+      [entityName, eventName] = data.event.split("#")
+      @eventProcessors[entityName]?[eventName]?(data)
 
-  Channels: (callback) ->
-    @get "/channels", callback
+  unsubscribe: (channelId) ->
+    @logger.debug "Unsubscribing from channel: #{channelId}"
+    @client.unsubscribe "/channels/#{channelId}"
+
+  subscribe: (channelId) ->
+    @logger.debug "Subscribing to channel: #{channelId}"
+    subscription = @client.subscribe "/channels/#{channelId}", (activity) =>
+      eventMap =
+        'enter':   'EnterMessage'
+        'leave':   'LeaveMessage'
+        'message': 'TextMessage'
+      @emit eventMap[activity.action], activity
+    subscription.errback((activity) =>
+      @logger.error activity
+      @logger.error "Oops! could not connect to the server"
+    )
+
+  message: (message, channelId, callback, errback) ->
+    body = {
+      content: message
+      channel_id: channelId
+      activity: {
+        content: message,
+        channel_id: channelId,
+        action: "message"
+      }
+    }
+    @post "/channels/#{ channelId }/activities", body, callback, errback
+
+  Channels: (callback, errback) ->
+    @get "/channels", callback, errback
 
   # Needs to be implemented in Kandan
-  User: (id, callback) ->
-    @get "/active_users.json", callback
+  User: (id, callback, errback) ->
+    @get "/active_users.json", callback, errback
 
-  Me: (callback) ->
-    @get "/me", callback
+  Me: (callback, errback) ->
+    @get "/me", callback, errback
 
-  Channel: (id) ->
-    self = @
-    logger = @robot.logger
+  Channel: (id) =>
+    logger = @logger
 
-    show: (callback) ->
-      self.post "/channels/#{id}", "", callback
+    show: (callback, errback) ->
+      @post "/channels/#{id}", "", callback, errback
 
-    join: (callback) ->
-      @robot.logger.info "Join is a NOOP on Kandan right now"
+    join: (callback, errback) ->
+      logger.info "Join is a NOOP on Kandan right now"
 
-    leave: (callback) ->
-      @robot.logger.info "Leave is a NOOP on Kandan right now"
+    leave: (callback, errback) ->
+      logger.info "Leave is a NOOP on Kandan right now"
 
 
-  get: (path, callback) ->
-    @request "GET", path, null, callback
+  get: (path, callback, errback) ->
+    @request "GET", path, null, callback, errback
 
-  post: (path, body, callback) ->
-    @request "POST", path, body, callback
+  post: (path, body, callback, errback) ->
+    @request "POST", path, body, callback, errback
 
-  request: (method, path, body, callback) ->
-    logger = @robot.logger
+  request: (method, path, body, callback, errback) ->
+    logger = @logger
 
     headers =
       "Content-Type" : "application/json"
@@ -143,12 +175,14 @@ class KandanStreaming extends EventEmitter
 
       body = new Buffer(body)
       options.headers["Content-Length"] = body.length
+    else
+      options.path += "?auth_token=#{@token}"
 
     request = HTTP.request options, (response) ->
       data = ""
 
       response.on "data", (chunk) ->
-          data += chunk
+        data += chunk
 
         response.on "end", ->
           if response.statusCode >= 400
@@ -157,11 +191,13 @@ class KandanStreaming extends EventEmitter
                 throw new Error "Invalid access token provided, Kandan refused the authentication"
               else
                 logger.error "Kandan error: #{response.statusCode}"
+            errback(response) if errback?
+            return
 
           try
-            callback null, JSON.parse(data) if callback?
+            callback JSON.parse(data) if callback?
           catch err
-            callback null, data or { } if callback?
+            errback(err) if errback?
 
     if method is "POST" || method is "PUT"
       request.end(body, 'binary')
@@ -170,3 +206,4 @@ class KandanStreaming extends EventEmitter
 
     request.on "error", (err) ->
       logger.error "Kandan request error: #{err}"
+      errback(response) if errback?
