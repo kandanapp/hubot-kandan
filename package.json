@@ -1,9 +1,18 @@
+/*
+
+  Hubot Adapter for Kandan
+  https://github.com/kandanapp/hubot-kandan
+ 
+  The Hubot Adapter for Kandan is licensed under The MIT License (MIT) 
+
+*/
+
 {
   "name":        "hubot-kandan",
   "version":     "0.9.7",
   "author":      "kandan",
   "keywords":    "github hubot kandan adapter",
-  "description": "A Kandan adapter for hubot",
+  "description": "A Kandan adapter for Hubot",
   "licenses":     [{
     "type":       "MIT",
     "url":        "http://github.com/kandanapp/hubot-kandan/raw/master/LICENSE"
