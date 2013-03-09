@@ -13,9 +13,9 @@ A Hubot adapter for [Kandan](http://kandanapp.com)
 
 You need to set a few environment variables in order for it to work
 
-* export HUBOT_KANDAN_CHANNELS="1" 
 * export HUBOT_KANDAN_HOST="www.kandanhostnamehere.com" 
 * export HUBOT_KANDAN_TOKEN="kandan-token"
+* export HUBOT_KANDAN_PORT="kandan-port-if-other-than-80"
 
 ## Contributing
 
