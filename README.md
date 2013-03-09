@@ -5,10 +5,6 @@ A Hubot adapter for [Kandan](http://kandanapp.com)
 
 ## Hubot Compatibility
 
-* Use version 0.2.x if you are using Hubot 2.3.x
-* Use version 0.3.x if you are using Hubot 2.4.x
-* All other hubot versions are not supported
-
 ## Installation
 
 * Add `hubot-kandan` as a dependency in your hubots `package.json`
@@ -35,6 +31,7 @@ Contributions are welcome. To get your work considered please do the following:
 
 ## License
 Copyright (c) 2012 Bushido Inc.
+
 Copyright (c) 2012-2012 KandanApp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
