@@ -1,3 +1,10 @@
+###
+Hubot Adapter for Kandan
+https://github.com/kandanapp/hubot-kandan
+ 
+The Hubot Adapter for Kandan is licensed under The MIT License (MIT) 
+###
+
 # Hubot API
 Robot        = require('hubot').Robot
 Adapter      = require('hubot').Adapter
