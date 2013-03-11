@@ -10,13 +10,13 @@ A Hubot adapter for [Kandan](http://kandanapp.com)
 * Run `rake kandan:hubot_access_key`
 * Download [Hubot from GitHub](https://github.com/github/hubot/archive/v2.4.7.zip)
 * Unzip hubot-2.4.7
-* ```
+```
 	cd hubot-2.4.7
 	npm install
 	make package
 	cd hubot
 	git clone git@github.com:kandanapp/hubot-kandan.git node_modules/hubot-kandan
- ```	
+```	
 
 * Add `hubot-kandan` as a dependency in your hubots `package.json`
 * Run `npm install` in your hubots directory.
