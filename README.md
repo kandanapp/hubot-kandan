@@ -3,32 +3,36 @@
 ## Description 
 A Hubot adapter for [Kandan](http://kandanapp.com)
 
-## Installation
+## Installation & Usage
 
 * Install Kandan --> [Installation Instructions](https://github.com/kandanapp/kandan/blob/master/DEPLOY.md)
-* Run `rake kandan:boot_hubot`
-* Run `rake kandan:hubot_access_key`
+* Once you've installed Kandan but before you start the server run these commands:
+
+```
+rake kandan:boot_hubot
+rake kandan:hubot_access_key
+```
+* Take note of the output of the command `rake kandan:hubot_access_key` as you will need it later
 * Download [Hubot from GitHub](https://github.com/github/hubot/archive/v2.4.7.zip)
 * Unzip hubot-2.4.7
+
 ```
-	cd hubot-2.4.7
-	npm install
-	make package
-	cd hubot
-	git clone git@github.com:kandanapp/hubot-kandan.git node_modules/hubot-kandan
+cd hubot-2.4.7
+npm install
+make package
+cd hubot
+git clone git@github.com:kandanapp/hubot-kandan.git node_modules/hubot-kandan
+npm install faye
 ```	
 
-* Add `hubot-kandan` as a dependency in your hubots `package.json`
-* Run `npm install` in your hubots directory.
-* Run hubot with `bin/hubot -a kandan`
+* Add `"hubot-kandan": "1.0"` as a dependency in your hubots `package.json`
+* Remove `"redis-brain.coffee",` from hubot-scripts.json 
 
-## Usage
+You will need to set a few environment variables in order for it to work properly
 
-You need to set a few environment variables in order for it to work
+`export HUBOT_KANDAN_HOST="www.kandanhostnamehere.com" HUBOT_KANDAN_PORT="kandan-port-if-other-than-80" HUBOT_KANDAN_TOKEN="hubot_access_key"`
 
-* export HUBOT_KANDAN_HOST="www.kandanhostnamehere.com" 
-* export HUBOT_KANDAN_TOKEN="kandan-token"
-* export HUBOT_KANDAN_PORT="kandan-port-if-other-than-80"
+Now just fire up hubot using: `./bin/hubot -a kandan`
 
 ## Contributing
 
