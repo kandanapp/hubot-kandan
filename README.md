@@ -3,6 +3,10 @@
 ## Description 
 A Hubot adapter for [Kandan](http://kandanapp.com)
 
+## WARNING
+Currently the Hubot Adapter for Kandan only will work with the code in the Kandan __MASTER__ branch and not in any
+of tagged/released branches.
+
 ## Installation & Usage
 
 * Install Kandan --> [Installation Instructions](https://github.com/kandanapp/kandan/blob/master/DEPLOY.md)
@@ -30,12 +34,11 @@ npm install faye
 
 You will need to set a few environment variables in order for it to work properly
 
-`export HUBOT_KANDAN_HOST="www.kandanhostnamehere.com" HUBOT_KANDAN_PORT="kandan-port-if-other-than-80" HUBOT_KANDAN_TOKEN="hubot_access_key"`
+`export HUBOT_KANDAN_HOST="hostname.com" HUBOT_KANDAN_PORT="port-if-not-80" HUBOT_KANDAN_TOKEN="hubot_access_key"`
 
 Now just fire up hubot using: `./bin/hubot -a kandan`
 
 ## Contributing
-
 Contributions are welcome. To get your work considered please do the following:
 
 1. Fork this project
