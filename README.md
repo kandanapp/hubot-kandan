@@ -40,7 +40,7 @@ To enable SSL connectivity:
 `export HUBOT_KANDAN_PROTCOL = "https"`
 
 If you're using a self signed/invalid certificate:
-`export HUBOT_KANDAN_INVALID_CERT = "true"
+`export HUBOT_KANDAN_INVALID_CERT = "true"`
 
 Now just fire up hubot using: `./bin/hubot -a kandan`
 
