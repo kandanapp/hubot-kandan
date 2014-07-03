@@ -36,6 +36,12 @@ You will need to set a few environment variables in order for it to work properl
 
 `export HUBOT_KANDAN_HOST="hostname.com" HUBOT_KANDAN_PORT="port-if-not-80" HUBOT_KANDAN_TOKEN="hubot_access_key"`
 
+To enable SSL connectivity:
+`export HUBOT_KANDAN_PROTCOL = "https"`
+
+If you're using a self signed/invalid certificate:
+`export HUBOT_KANDAN_INVALID_CERT = "true"
+
 Now just fire up hubot using: `./bin/hubot -a kandan`
 
 ## Contributing

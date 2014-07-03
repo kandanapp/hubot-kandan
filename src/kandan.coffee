@@ -33,7 +33,7 @@ class Kandan extends Adapter
       host:     process.env.HUBOT_KANDAN_HOST
       port:     process.env.HUBOT_KANDAN_PORT || 80
       token:    process.env.HUBOT_KANDAN_TOKEN
-      self_sign:process.env.HUBOT_INVALID_CERT || false
+      self_sign:process.env.HUBOT_KANDAN_INVALID_CERT || false
 
     @bot = new KandanStreaming(options, @robot)
     callback = (myself) =>
