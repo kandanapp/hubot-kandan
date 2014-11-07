@@ -26,7 +26,7 @@ npm install
 make package
 cd hubot
 git clone git@github.com:kandanapp/hubot-kandan.git node_modules/hubot-kandan
-npm install faye
+npm install faye ntwitter
 ```	
 
 * Add `"hubot-kandan": "1.0"` as a dependency in your hubots `package.json`
