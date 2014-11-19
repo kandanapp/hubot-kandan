@@ -125,7 +125,6 @@ class KandanStreaming extends EventEmitter
       channel_id: channelId
       activity: {
         content: message,
-        channel_id: channelId,
         action: "message"
       }
     }
