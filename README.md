@@ -29,7 +29,7 @@ git clone git@github.com:kandanapp/hubot-kandan.git node_modules/hubot-kandan
 npm install faye
 ```	
 
-* Add `"hubot-kandan": "1.0"` as a dependency in your hubots `package.json`
+* Add `"hubot-kandan": "1.0.0"` as a dependency in your hubots `package.json`
 * Remove `"redis-brain.coffee",` from hubot-scripts.json 
 
 You will need to set a few environment variables in order for it to work properly
