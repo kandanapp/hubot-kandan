@@ -11,7 +11,10 @@ Adapter      = require('hubot').Adapter
 TextMessage  = require('hubot').TextMessage
 
 # Node API
-HTTP         = require('http')
+HTTP         = if process.env.HUBOT_KANDAN_PROTOCOL == "https"
+                 require('https')
+               else
+                 require('http')
 EventEmitter = require('events').EventEmitter
 
 # Faye connector
@@ -26,9 +29,11 @@ class Kandan extends Adapter
 
   run: ->
     options =
-      host:     process.env.HUBOT_KANDAN_HOST
-      port:     process.env.HUBOT_KANDAN_PORT || 80
-      token:    process.env.HUBOT_KANDAN_TOKEN
+      protocol:  process.env.HUBOT_KANDAN_PROTOCOL || http
+      host:      process.env.HUBOT_KANDAN_HOST
+      port:      process.env.HUBOT_KANDAN_PORT || 80
+      token:     process.env.HUBOT_KANDAN_TOKEN
+      self_sign: process.env.HUBOT_KANDAN_INVALID_CERT || false
 
     @bot = new KandanStreaming(options, @robot)
     callback = (myself) =>
@@ -60,13 +65,18 @@ class KandanStreaming extends EventEmitter
       robot.logger.error "Not enough parameters provided. I need a host and token."
       process.exit(1)
 
-    @host     = options.host
-    @port     = options.port
-    @token    = options.token
+    @host      = options.host
+    @port      = options.port
+    @token     = options.token
+    @protocol  = options.protocol
+    @self_sign = options.self_sign
 
     @logger = robot.logger
 
-    target = "http://#{ @host }:#{ @port }/remote/faye"
+    if @self_sign == "true"
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+    target = "{ @protocol }://#{ @host }:#{ @port }/remote/faye"
     robot.logger.info("Connecting to #{ target }")
 
     @client = new Faye.Client(target)
