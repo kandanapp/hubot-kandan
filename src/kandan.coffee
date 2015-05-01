@@ -19,10 +19,10 @@ Faye         = require('faye')
 
 class Kandan extends Adapter
 
-  send: (user, strings...) ->
+  send: (envelope, strings...) ->
     if strings.length > 0
-      callback = errback = (response) => @send user, strings...
-      @bot.message strings.shift(), user?.room?.id || 1, callback, errback
+      callback = errback = (response) => @send envelope, strings...
+      @bot.message strings.shift(), envelope.room || 1, callback, errback
 
   run: ->
     options =
@@ -34,8 +34,10 @@ class Kandan extends Adapter
     callback = (myself) =>
       @bot.on "TextMessage", (message) =>
         unless myself.id == message.user.id
-          message.user.room = message.channel
-          @receive new TextMessage(message.user, message.content)
+          envelope =
+            user: message.user.id
+            room: message.channel.id
+          @receive new TextMessage(envelope, message.content)
       @emit "connected"
     errback = (response) =>
       throw new Error "Unable to determine profile information."
