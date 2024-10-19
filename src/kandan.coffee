@@ -22,7 +22,7 @@ class Kandan extends Adapter
   send: (user, strings...) ->
     if strings.length > 0
       callback = errback = (response) => @send user, strings...
-      @bot.message strings.shift(), user?.room?.id || 1, callback, errback
+      @bot.message strings.shift(), user?.room || 1, callback, errback
 
   run: ->
     options =
@@ -34,7 +34,7 @@ class Kandan extends Adapter
     callback = (myself) =>
       @bot.on "TextMessage", (message) =>
         unless myself.id == message.user.id
-          message.user.room = message.channel
+          message.user.room = message.channel.id
           @receive new TextMessage(message.user, message.content)
       @emit "connected"
     errback = (response) =>
