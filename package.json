@@ -1,6 +1,6 @@
 {
   "name":        "hubot-kandan",
-  "version":     "1.0",
+  "version":     "1.0.0",
   "author":      "kandan",
   "keywords":    "github hubot kandan adapter",
   "description": "A Kandan adapter for Hubot",
